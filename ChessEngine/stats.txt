@@ -1,0 +1,92 @@
+perft 6
+Elapsed time: 62.0414
+Nodes searched: 119060324
+
+perft 7
+Elapsed time: 1768.13
+Nodes searched: 3195901860
+11.4
+155
+
+generateMoves for startpos
+Elapsed time: 9.3e-06
+
+
+Depth: 5
+Bounds: 235 285
+Bounds: 235 310
+PV: b1c3 g7g6 g1f3 f7f5 d2d4
+Score: 300
+tt usage: 0.001
+Elapsed time: 0.052
+Nodes searched: 19493
+
+Depth: 6
+Bounds: 275 325
+Bounds: 250 300
+Bounds: 219 275
+Bounds: 181 247
+PV: b1a3 e7e5 a3c4 d8h4 c4e5 h4h2
+Score: 195
+tt usage: 0.006
+Elapsed time: 0.813
+Nodes searched: 248359
+
+Depth: 7
+Bounds: 170 220
+Bounds: 170 245
+Bounds: 170 276
+Bounds: 170 314
+PV: d2d4 g7g6 g1f3 f7f5 d1d3 b7b6 d3f5
+Score: 310
+tt usage: 0.011
+Elapsed time: 2.463
+Nodes searched: 826825
+
+Depth: 8
+Bounds: 285 335
+Bounds: 260 310
+Bounds: 229 285
+Bounds: 191 257
+Bounds: 144 224
+PV: d2d4 c7c5 d4c5 d8a5 c1d2 a5c5 g1f3 c5f2
+Score: 165
+tt usage: 0.038
+Elapsed time: 14.249
+Nodes searched: 3966044
+
+Depth: 9
+Bounds: 140 190
+Bounds: 140 215
+Bounds: 140 246
+Bounds: 140 284
+Bounds: 140 331
+PV: d2d4 g7g6 g1f3 f7f5 b1c3 b7b6 d1d3 c7c5 d3f5
+Score: 320
+tt usage: 0.094
+Elapsed time: 39.792
+Nodes searched: 13611760
+
+Depth: 10
+Bounds: 295 345
+Bounds: 270 320
+Bounds: 239 295
+Bounds: 201 267
+Bounds: 154 234
+PV: d2d4 e7e6 c1f4 d8h4 f4g3 h4h5 g3c7 f8b4 c2c3 h5h2
+Score: 155
+tt usage: 0.734
+Elapsed time: 515.821
+Nodes searched: 141132000
+
+Depth: 11
+Bounds: 130 180
+Bounds: 130 205
+Bounds: 130 236
+Bounds: 130 274
+Bounds: 130 321
+PV: b1c3 e7e6 g1f3 f7f5 d2d4 h7h6 e2e4 f5e4 c3e4 f8b4 c1d2
+Score: 320
+tt usage: 0.971
+Elapsed time: 1513.99
+Nodes searched: 446484839
