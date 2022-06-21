@@ -3,7 +3,7 @@
 #include"movegen.h"
 #include"uci.h"
 
-void uci::position(Board& board, istringstream& ss) {
+void uci::position(istringstream& ss) {
 	string token, fen;
 	ss >> token;
 
@@ -22,7 +22,7 @@ void uci::position(Board& board, istringstream& ss) {
 
 	Move move;
 	while (ss >> token) {
-		move = uci::toMove(board, token);
+		move = uci::toMove(token);
 		
 		// invalid move
 		if (move == Move()) {
@@ -34,16 +34,14 @@ void uci::position(Board& board, istringstream& ss) {
 	}
 }
 
-void uci::go(Board& board, const string& str) {
+void uci::go(const string& str) {
 	istringstream ss(str);
-	Search search = Search();
-	Move best = search.bestMove(board);
 
-	cout << "bestmove " << best.toString() << "\n";
+	// start the search
+	searchThread = std::thread(searchAndPrint);
 }
 
-void uci::runLoop() {
-	Board board;
+void uci::loop() {
 	string line, token;
 	istringstream ss;
 	for (;;) {
@@ -51,29 +49,39 @@ void uci::runLoop() {
 		ss = istringstream(line);
 		ss >> token;
 
-		if (token == "quit")
+		if (token == "quit") {
 			break;
+		}
+
+		if (token == "stop") {
+			search.stop();
+			searchThread.join();
+		}
 
 		else if (token == "id") {
-			cout << "id name MyChessEngine" << "\n";
-			cout << "id author Me" << "\n";
 		}
 		else if (token == "uci")
 			cout << "uciok\n";
 		else if (token == "isready")
 			cout << "readyok\n";
-		else if (token == "position") position(board, ss);
-		else if (token == "go")       go(board, ss.str());
+		else if (token == "position") position(ss);
+		else if (token == "go")       go(ss.str());
+
+		// non-UCI commands
 		else if (token == "d") cout << board << "\n";
-		
 	}
 }
 
-Move uci::toMove(Board& board, const string& str) {
+Move uci::toMove(const string& str) {
 	MoveList moves = generateMoves(board);
 	for (auto& m : moves) {
 		if (m.toString() == str)
 			return m;
 	}
 	return Move();
+}
+
+void uci::searchAndPrint() {
+	Move best = search.bestMove(board);
+	cout << "bestmove " << best.toString() << "\n";
 }

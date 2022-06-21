@@ -1,10 +1,18 @@
 #pragma once
 
+#include<thread>
+
 #include"search.h"
 
 namespace uci {
-	void position(Board& board, istringstream& ss);
-	void go(Board& board, const string& str);
-	void runLoop();
-	Move toMove(Board& board, const string& str);
+	inline Board board = Board();
+	inline Search search = Search();
+	inline std::thread searchThread;
+
+	void position(istringstream& ss);
+	void go(const string& str);
+	void loop();
+	Move toMove(const string& str);
+
+	void searchAndPrint();
 }

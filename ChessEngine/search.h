@@ -32,4 +32,10 @@ struct Search {
 	Score alphaBeta(Board& board, Stack* ss, Score alpha, Score beta, Depth depth);
 	template<SearchType searchType>
 	Score quiescence(Board& board, Score alpha, Score beta);
+
+	void stop();
 };
+
+inline void Search::stop() {
+	time.stop = true;
+}
