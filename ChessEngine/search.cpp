@@ -36,7 +36,7 @@ Move Search::bestMove(Board& board) {
 				cout << "Bounds: " << alpha << " " << beta << "\n";
 				score = alphaBeta<Root>(board, &stack, alpha, beta, depth);
 
-				if (time.hitTimeLimit())
+				if (time.stop)
 					break;
 
 				if (score <= alpha) {
@@ -53,7 +53,7 @@ Move Search::bestMove(Board& board) {
 			}
 		}
 
-		if (time.hitTimeLimit())
+		if (time.stop)
 			break;
 
 		pv.clear();
