@@ -5,7 +5,7 @@
 #include"bitboard.h"
 #include"board.h"
 
-using MoveList = vector<Move>;
+using MoveList = std::vector<Move>;
 
 struct KingAttackInfo {
     Bitboard pinned;
@@ -37,6 +37,6 @@ inline void append(MoveList& a, MoveList& b) {
 
 inline void print(MoveList& moveList) {
 	for (auto& m : moveList)
-		cout << m.toString() << " ";
-	cout << "\n";
+		std::cout << m.toString() << " ";
+	std::cout << "\n";
 }

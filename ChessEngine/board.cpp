@@ -1,4 +1,4 @@
-#include<iostream>
+#include<ostream>
 #include<sstream>
 #include<string>
 
@@ -6,24 +6,24 @@
 #include"board.h"
 #include"movegen.h"
 
-Board::Board(const string& FEN) {
+Board::Board(const std::string& FEN) {
 	for (auto& pc : board) {
 		pc = NO_PIECE;
 	}
 
 	BoardStatus bs = BoardStatus();
-	history = vector<BoardStatus>();
+	history = std::vector<BoardStatus>();
 	history.push_back(bs);
 	st = getBoardStatus();
 
-	istringstream ss(FEN);
-	string token;
+	std::istringstream ss(FEN);
+	std::string token;
 
 	ss >> token;
 	Square sq = A8;
 	Piece pc;
 	for (char c : token) {
-		if ((pc = pieceToChar.find(c)) != string::npos) {
+		if ((pc = pieceToChar.find(c)) != std::string::npos) {
 			setPiece<false>(pc, sq);
 			sq += EAST;
 		}
@@ -69,21 +69,21 @@ Board::Board(const string& FEN) {
 	st->zobrist = 42;
 }
 
-ostream& operator<<(ostream& os, Board& board) {
+std::ostream& operator<<(std::ostream& os, Board& board) {
 	for (Rank r = RANK_8; r >= RANK_1; --r) {
 		for (File f = FILE_A; f <= FILE_H; ++f) {
 			Piece pc = board.getPiece(bb::getSquare(f, r));
 			if (pc == NO_PIECE)
-				cout << ". ";
+				std::cout << ". ";
 			else
-				cout << pieceToChar[pc] << " ";
+				std::cout << pieceToChar[pc] << " ";
 		}
 		os << '\n';
 	}
 	return os;
 }
 
-ostream& operator<<(ostream& os, BoardStatus& bs) {
+std::ostream& operator<<(std::ostream& os, BoardStatus& bs) {
 	os << "plyCount: " << bs.plyCount << '\n'
 		<< "fityMoveCount: " << bs.fiftyMoveCount << '\n'
 		<< "castlings: " << bs.castlings.data << '\n'
@@ -94,8 +94,8 @@ ostream& operator<<(ostream& os, BoardStatus& bs) {
 	return os;
 }
 
-string Board::fen() {
-	stringstream ss;
+std::string Board::fen() {
+	std::stringstream ss;
 
 	for (Rank r = RANK_8; r >= RANK_1; --r) {
 		int emptyCount = 0;

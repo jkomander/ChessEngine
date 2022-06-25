@@ -5,14 +5,14 @@
 #include"search.h"
 
 namespace uci {
-	inline Board board = Board();
+	inline Board board = Board(startFEN);
 	inline Search search = Search();
 	inline std::thread searchThread;
 
-	void position(istringstream& ss);
-	void go(const string& str);
+	void position(std::istringstream& ss);
+	void go(const std::string& str);
 	void loop();
-	Move toMove(const string& str);
+	Move toMove(const std::string& str);
 
 	void searchAndPrint();
 }

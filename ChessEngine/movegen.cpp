@@ -1,7 +1,7 @@
 #include"attacks.h"
 #include"movegen.h"
 
-const array<Move::Promotion, 4>promotions =
+const std::array<Move::Promotion, 4>promotions =
 { Move::Knight, Move::Bishop, Move::Rook, Move::Queen };
 
 KingAttackInfo::KingAttackInfo(Board& board) {
@@ -356,7 +356,7 @@ uint64_t perft(Board& board, int depth) {
 			board.undoMove();
 		}
 		if (Root)
-			cout << move.toString() << ": " << cnt << "\n";
+			std::cout << move.toString() << ": " << cnt << "\n";
 	}
 	return nodes;
 }

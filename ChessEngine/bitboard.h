@@ -4,8 +4,6 @@
 #include<intrin.h>
 #include<string>
 
-using namespace std;
-
 using Color = bool;
 using Piece = int;
 using PieceType = int;
@@ -102,7 +100,7 @@ enum Directions {
 	N_DIRECTIONS = 8
 };
 
-const string pieceToChar = " PNBRQK  pnbrqk";
+const std::string pieceToChar = " PNBRQK  pnbrqk";
 
 namespace bb {
 	inline Piece getPiece(Color c, PieceType pt) {
@@ -125,7 +123,7 @@ namespace bb {
 		return 8 * rank + file;
 	}
 
-	inline Square getSquare(const string& str) {
+	inline Square getSquare(const std::string& str) {
 		return getSquare(File(str[0] - 'a'), Rank(str[1] - '1'));
 	}
 
@@ -136,8 +134,8 @@ namespace bb {
 
 	constexpr inline Square relativeSquare(Color c, Square sq) { return c ? sq ^ A8 : sq; }
 
-	inline string toString(Square sq) {
-		return string(1, 'a' + file(sq)) + string(1, '1' + rank(sq));
+	inline std::string toString(Square sq) {
+		return std::string(1, 'a' + file(sq)) + std::string(1, '1' + rank(sq));
 	}
 
 	inline bool isValid(Square sq) {
@@ -145,7 +143,7 @@ namespace bb {
 	}
 
 	inline int distance(Square s1, Square s2) {
-		return max(abs(file(s1) - file(s2)), abs(rank(s1) - rank(s2)));
+		return std::max(abs(file(s1) - file(s2)), abs(rank(s1) - rank(s2)));
 	}
 
 	inline Direction pawnPush(Color c) {
@@ -212,7 +210,7 @@ struct Bitboard {
 		return data == b.data;
 	}
 
-	friend ostream& operator<<(ostream& os, Bitboard b);
+	friend std::ostream& operator<<(std::ostream& os, Bitboard b);
 
 	bool at(Square sq) { return data & uint64_t(1) << sq; }
 	void set(Square sq) { data |= uint64_t(1) << sq; }
@@ -303,12 +301,12 @@ struct Move {
 		return *this == Move();
 	}
 
-	friend ostream& operator<<(ostream& os, Move& move) {
+	friend std::ostream& operator<<(std::ostream& os, Move& move) {
 		os << move.toString();
 		return os;
 	}
 
-	string toString();
+	std::string toString();
 
 	void mirror() {
 		bb::mirror(from);

@@ -1,10 +1,10 @@
-#include<iostream>
+#include<ostream>
 
 #include"movegen.h"
 #include"uci.h"
 
-void uci::position(istringstream& ss) {
-	string token, fen;
+void uci::position(std::istringstream& ss) {
+	std::string token, fen;
 	ss >> token;
 
 	if (token == "startpos") {
@@ -26,7 +26,7 @@ void uci::position(istringstream& ss) {
 		
 		// invalid move
 		if (move == Move()) {
-			cout << "Invalid move: " << token << "\n";
+			std::cout << "Invalid move: " << token << "\n";
 			break;
 		}
 
@@ -34,19 +34,19 @@ void uci::position(istringstream& ss) {
 	}
 }
 
-void uci::go(const string& str) {
-	istringstream ss(str);
+void uci::go(const std::string& str) {
+	std::istringstream ss(str);
 
 	// start the search
 	searchThread = std::thread(searchAndPrint);
 }
 
 void uci::loop() {
-	string line, token;
-	istringstream ss;
+	std::string line, token;
+	std::istringstream ss;
 	for (;;) {
-		getline(cin, line);
-		ss = istringstream(line);
+		std::getline(std::cin, line);
+		ss = std::istringstream(line);
 		ss >> token;
 
 		if (token == "quit") {
@@ -61,18 +61,18 @@ void uci::loop() {
 		else if (token == "id") {
 		}
 		else if (token == "uci")
-			cout << "uciok\n";
+			std::cout << "uciok\n";
 		else if (token == "isready")
-			cout << "readyok\n";
+			std::cout << "readyok\n";
 		else if (token == "position") position(ss);
 		else if (token == "go")       go(ss.str());
 
 		// non-UCI commands
-		else if (token == "d") cout << board << "\n";
+		else if (token == "d") std::cout << board << "\n";
 	}
 }
 
-Move uci::toMove(const string& str) {
+Move uci::toMove(const std::string& str) {
 	MoveList moves = generateMoves(board);
 	for (auto& m : moves) {
 		if (m.toString() == str)
@@ -83,5 +83,5 @@ Move uci::toMove(const string& str) {
 
 void uci::searchAndPrint() {
 	Move best = search.bestMove(board);
-	cout << "bestmove " << best.toString() << "\n";
+	std::cout << "bestmove " << best.toString() << "\n";
 }

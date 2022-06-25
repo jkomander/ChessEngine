@@ -21,7 +21,7 @@ Move Search::bestMove(Board& board) {
 		if (depth > maxDepth)
 			break;
 
-		cout << "Depth: " << depth << "\n";
+		std::cout << "Depth: " << depth << "\n";
 
 		if (depth < 4) {
 			score = alphaBeta<Root>(board, &stack, alpha, beta, depth);
@@ -33,7 +33,7 @@ Move Search::bestMove(Board& board) {
 			alpha = prevScore - delta;
 			beta = prevScore + delta;
 			for (;;) {
-				cout << "Bounds: " << alpha << " " << beta << "\n";
+				std::cout << "Bounds: " << alpha << " " << beta << "\n";
 				score = alphaBeta<Root>(board, &stack, alpha, beta, depth);
 
 				if (time.stop)
@@ -60,13 +60,13 @@ Move Search::bestMove(Board& board) {
 		for (int i = 0; i < stack.pvSize; ++i)
 			pv.push_back(stack.pv[i]);
 
-		cout << "PV: ";
+		std::cout << "PV: ";
 		print(pv);
-		cout << "Score: " << score << "\n";
-		cout << "tt usage: " << tt.usage() << "\n";
-		cout << "Elapsed time: " << time.elapsed() * 1e-3 << "\n";
-		cout << "Nodes searched: " << nodes << "\n";
-		cout << "\n";
+		std::cout << "Score: " << score << "\n";
+		std::cout << "tt usage: " << tt.usage() << "\n";
+		std::cout << "Elapsed time: " << time.elapsed() * 1e-3 << "\n";
+		std::cout << "Nodes searched: " << nodes << "\n";
+		std::cout << "\n";
 
 		++depth;
 	}
@@ -146,7 +146,7 @@ Score Search::alphaBeta(Board& board, Stack* ss, Score alpha, Score beta, Depth 
 		++moveCount;
 
 		if (rootNode && depth >= 11)
-			cout << move << "\n";
+			std::cout << move << "\n";
 
 		board.applyMove(move);
 
@@ -186,7 +186,7 @@ Score Search::alphaBeta(Board& board, Stack* ss, Score alpha, Score beta, Depth 
 			nodeType = PV_NODE;
 
 			if (rootNode && depth >= 11)
-				cout << score << "\n";
+				std::cout << score << "\n";
 		}
 	}
 

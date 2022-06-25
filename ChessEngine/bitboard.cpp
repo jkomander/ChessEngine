@@ -1,8 +1,8 @@
-#include<iostream>
+#include<ostream>
 
 #include"bitboard.h"
 
-ostream& operator<<(ostream& os, Bitboard b) {
+std::ostream& operator<<(std::ostream& os, Bitboard b) {
 	for (Rank r = RANK_8; r >= RANK_1; --r) {
 		for (File f = FILE_A; f <= FILE_H; ++f) {
 			Square sq = bb::getSquare(f, r);
@@ -13,8 +13,8 @@ ostream& operator<<(ostream& os, Bitboard b) {
 	return os;
 }
 
-string Move::toString() {
-	string s = bb::toString(from) + bb::toString(to);
+std::string Move::toString() {
+	std::string s = bb::toString(from) + bb::toString(to);
 
 	switch (promotion) {
 	case Promotion::None:

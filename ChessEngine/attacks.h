@@ -5,22 +5,22 @@
 #include"bitboard.h"
 
 namespace attacks {
-	inline array<array<Bitboard, N_SQUARES>, N_COLORS>pawnAttacks;
-	inline array<Bitboard, N_SQUARES>knightAttacks;
-	inline array<Bitboard, N_SQUARES>kingAttacks;
-	inline array<int, 8>knightDirections = { 17,10,-6,-15,-17,-10,6,15 };
-	inline array<int, 8>kingDirections = { 8,9,1,-7,-8,-9,-1,7 };
-	inline array<int, 4>bishopDirections = { 9,-7,-9,7 };
-	inline array<int, 4>rookDirections = { 8,1,-8,-1 };
+	inline std::array<std::array<Bitboard, N_SQUARES>, N_COLORS>pawnAttacks;
+	inline std::array<Bitboard, N_SQUARES>knightAttacks;
+	inline std::array<Bitboard, N_SQUARES>kingAttacks;
+	inline std::array<int, 8>knightDirections = { 17,10,-6,-15,-17,-10,6,15 };
+	inline std::array<int, 8>kingDirections = { 8,9,1,-7,-8,-9,-1,7 };
+	inline std::array<int, 4>bishopDirections = { 9,-7,-9,7 };
+	inline std::array<int, 4>rookDirections = { 8,1,-8,-1 };
 
-	inline array<Bitboard, 8>files = { FILE_A_BB, FILE_B_BB, FILE_C_BB, FILE_D_BB,
+	inline std::array<Bitboard, 8>files = { FILE_A_BB, FILE_B_BB, FILE_C_BB, FILE_D_BB,
 									   FILE_E_BB, FILE_F_BB, FILE_G_BB, FILE_H_BB };
-	inline array<Bitboard, 8>ranks = { RANK_1_BB, RANK_2_BB, RANK_3_BB, RANK_4_BB,
+	inline std::array<Bitboard, 8>ranks = { RANK_1_BB, RANK_2_BB, RANK_3_BB, RANK_4_BB,
 									   RANK_5_BB, RANK_6_BB, RANK_7_BB, RANK_8_BB };
-	inline array<Bitboard, 15>diagonals;
-	inline array<Bitboard, 15>antiDiagonals;
-	inline array<Bitboard, N_SQUARES>bishopAttacks;
-	inline array<Bitboard, N_SQUARES>rookAttacks;
+	inline std::array<Bitboard, 15>diagonals;
+	inline std::array<Bitboard, 15>antiDiagonals;
+	inline std::array<Bitboard, N_SQUARES>bishopAttacks;
+	inline std::array<Bitboard, N_SQUARES>rookAttacks;
 
 	enum Directions {
 		NORTHEAST,
@@ -33,7 +33,7 @@ namespace attacks {
 		WEST,
 		N_DIRECTIONS
 	};
-	inline array<array<Bitboard, N_SQUARES>, N_DIRECTIONS>rayAttacks;
+	inline std::array<std::array<Bitboard, N_SQUARES>, N_DIRECTIONS>rayAttacks;
 
 	inline void init() {
 		// knight attacks

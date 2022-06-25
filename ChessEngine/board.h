@@ -6,7 +6,7 @@
 #include"bitboard.h"
 #include"random.h"
 
-const string startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+const std::string startFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 enum CastlingRights {
 	NO_CASTLING,
@@ -49,24 +49,24 @@ struct BoardStatus {
 	Piece captured;
 	Move move;
 
-	friend ostream& operator<<(ostream& os, BoardStatus& bs);
+	friend std::ostream& operator<<(std::ostream& os, BoardStatus& bs);
 };
 
 struct Board {
-	array<Piece, N_SQUARES>board;
-	array<Bitboard, N_PIECE_TYPES>pieceBB;
-	array<Bitboard, N_COLORS>colorBB;
+	std::array<Piece, N_SQUARES>board;
+	std::array<Bitboard, N_PIECE_TYPES>pieceBB;
+	std::array<Bitboard, N_COLORS>colorBB;
 	Bitboard occupiedBB;
 	Color sideToMove;
-	vector<BoardStatus>history;
+	std::vector<BoardStatus>history;
 	BoardStatus* st;
 
 	Board() = default;
-	Board(const string& FEN);
+	Board(const std::string& FEN);
 
-	friend ostream& operator<<(ostream& os, Board& board);
+	friend std::ostream& operator<<(std::ostream& os, Board& board);
 
-	string fen();
+	std::string fen();
 
 	Piece getPiece(Square sq);
 	template<bool updateZobrist = true>
@@ -147,10 +147,10 @@ inline bool Board::isDraw() {
 }
 
 namespace Zobrist {
-	inline array<array<Key, N_SQUARES>, 16>psq;
+	inline std::array<std::array<Key, N_SQUARES>, 16>psq;
 	inline Key side;
-	inline array<Key, 16>castling;
-	inline array<Key, N_FILES>enPassant;
+	inline std::array<Key, 16>castling;
+	inline std::array<Key, N_FILES>enPassant;
 
 	inline void init() {
 		for (int i = 0; i < 16; ++i) {

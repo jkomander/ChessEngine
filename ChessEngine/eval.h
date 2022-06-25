@@ -3,15 +3,15 @@
 #include"movegen.h"
 
 namespace eval {
-	inline array<array<Score, N_SQUARES>, N_COLORS>pawnTable;
-	inline array<array<Score, N_SQUARES>, N_COLORS>knightTable;
-	inline array<array<Score, N_SQUARES>, N_COLORS>bishopTable;
-	inline array<array<Score, N_SQUARES>, N_COLORS>rookTable;
-	inline array<array<Score, N_SQUARES>, N_COLORS>queenTable;
-	inline array<array<Score, N_SQUARES>, N_COLORS>mgKingTable;
-	inline array<array<Score, N_SQUARES>, N_COLORS>egKingTable;
+	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>pawnTable;
+	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>knightTable;
+	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>bishopTable;
+	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>rookTable;
+	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>queenTable;
+	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>mgKingTable;
+	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>egKingTable;
 
-	inline array<Score, N_PIECE_TYPES>pieceValues = { 100, 350, 350, 525, 1000 };
+	inline std::array<Score, N_PIECE_TYPES>pieceValues = { 100, 350, 350, 525, 1000 };
 
 	inline Score getPieceValue(PieceType pt) {
 		return pieceValues[pt - 1];
