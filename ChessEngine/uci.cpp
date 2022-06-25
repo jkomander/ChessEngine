@@ -26,7 +26,7 @@ void uci::position(std::istringstream& ss) {
 		
 		// invalid move
 		if (move == Move()) {
-			std::cout << "Invalid move: " << token << "\n";
+			std::cout << "Invalid move: " << token << std::endl;
 			break;
 		}
 
@@ -36,27 +36,41 @@ void uci::position(std::istringstream& ss) {
 
 void uci::go(const std::string& str) {
 	std::istringstream ss(str);
+	std::string token;
+
+	stop();
+
+	search.time = TimeManagement();
+
+	while (ss >> token) {
+		if (token == "wtime") ss >> search.time.time[WHITE];
+		else if (token == "btime") ss >> search.time.time[BLACK];
+		else if (token == "winc") ss >> search.time.inc[WHITE];
+		else if (token == "binc") ss >> search.time.inc[BLACK];
+	}
 
 	// start the search
 	searchThread = std::thread(searchAndPrint);
 }
 
 void uci::loop() {
+	board = Board(startFEN);
+
 	std::string line, token;
 	std::istringstream ss;
+
 	for (;;) {
 		std::getline(std::cin, line);
 		ss = std::istringstream(line);
+		token.clear();
 		ss >> token;
 
 		if (token == "quit") {
+			stop();
 			break;
 		}
 
-		if (token == "stop") {
-			search.stop();
-			searchThread.join();
-		}
+		if (token == "stop") stop();
 
 		else if (token == "id") {
 		}
@@ -68,7 +82,7 @@ void uci::loop() {
 		else if (token == "go")       go(ss.str());
 
 		// non-UCI commands
-		else if (token == "d") std::cout << board << "\n";
+		else if (token == "d") std::cout << board << std::endl;
 	}
 }
 
@@ -83,5 +97,11 @@ Move uci::toMove(const std::string& str) {
 
 void uci::searchAndPrint() {
 	Move best = search.bestMove(board);
-	std::cout << "bestmove " << best.toString() << "\n";
+	std::cout << "bestmove " << best.toString() << std::endl;
+}
+
+void uci::stop() {
+	search.stop();
+	if (searchThread.joinable())
+		searchThread.join();
 }

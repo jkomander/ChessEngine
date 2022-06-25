@@ -5,7 +5,7 @@
 #include"search.h"
 
 namespace uci {
-	inline Board board = Board(startFEN);
+	inline Board board;
 	inline Search search = Search();
 	inline std::thread searchThread;
 
@@ -15,4 +15,5 @@ namespace uci {
 	Move toMove(const std::string& str);
 
 	void searchAndPrint();
+	void stop();
 }

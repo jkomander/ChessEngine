@@ -3,11 +3,19 @@
 #include"search.h"
 
 Move Search::bestMove(Board& board) {
-	time.stop = false;
-	time.optimum = 7 * 24 * 3600 * 1000;
 	time.start();
-	Depth maxDepth = 256;
+	
+	Color us = board.sideToMove;
+	time.maximum = time.time[us];
+	if (time.maximum)
+		time.optimum = 0.1 * (time.maximum - time.inc[us]) + time.inc[us] - 100;
+	else
+		time.optimum = 7 * 24 * 3600 * 1000;
+	std::cout << "Optimal time: " << 1e-3 * time.optimum << std::endl << "\n";
 
+	nodes = 0;
+
+	Depth maxDepth = 256;
 	Score alpha = -INFINITY_SCORE;
 	Score beta = INFINITY_SCORE;
 	Score delta;
@@ -21,7 +29,7 @@ Move Search::bestMove(Board& board) {
 		if (depth > maxDepth)
 			break;
 
-		std::cout << "Depth: " << depth << "\n";
+		std::cout << "Depth: " << depth << std::endl;
 
 		if (depth < 4) {
 			score = alphaBeta<Root>(board, &stack, alpha, beta, depth);
@@ -33,7 +41,7 @@ Move Search::bestMove(Board& board) {
 			alpha = prevScore - delta;
 			beta = prevScore + delta;
 			for (;;) {
-				std::cout << "Bounds: " << alpha << " " << beta << "\n";
+				std::cout << "Bounds: " << alpha << " " << beta << std::endl;
 				score = alphaBeta<Root>(board, &stack, alpha, beta, depth);
 
 				if (time.stop)
@@ -66,10 +74,11 @@ Move Search::bestMove(Board& board) {
 		std::cout << "tt usage: " << tt.usage() << "\n";
 		std::cout << "Elapsed time: " << time.elapsed() * 1e-3 << "\n";
 		std::cout << "Nodes searched: " << nodes << "\n";
-		std::cout << "\n";
+		std::cout << std::endl;
 
 		++depth;
 	}
+	std::cout << "Elapsed time: " << time.elapsed() * 1e-3 << std::endl;
 	return pv[0];
 }
 
@@ -146,7 +155,7 @@ Score Search::alphaBeta(Board& board, Stack* ss, Score alpha, Score beta, Depth 
 		++moveCount;
 
 		if (rootNode && depth >= 11)
-			std::cout << move << "\n";
+			std::cout << move << std::endl;
 
 		board.applyMove(move);
 
@@ -186,7 +195,7 @@ Score Search::alphaBeta(Board& board, Stack* ss, Score alpha, Score beta, Depth 
 			nodeType = PV_NODE;
 
 			if (rootNode && depth >= 11)
-				std::cout << score << "\n";
+				std::cout << score << std::endl;
 		}
 	}
 
