@@ -39,6 +39,9 @@
     <ClCompile Include="tt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="movepick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h">
@@ -72,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="eval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="movepick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

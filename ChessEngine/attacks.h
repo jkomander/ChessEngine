@@ -35,6 +35,8 @@ namespace attacks {
 	};
 	inline std::array<std::array<Bitboard, N_SQUARES>, N_DIRECTIONS>rayAttacks;
 
+	inline std::array<std::array<Bitboard, N_SQUARES>, N_SQUARES>inBetweenSquares;
+
 	inline void init() {
 		// knight attacks
 		for (Square from = A1; from < N_SQUARES; ++from) {
@@ -139,6 +141,19 @@ namespace attacks {
 			Bitboard b = Bitboard::fromSquare(sq);
 			pawnAttacks[WHITE][sq] |= b.shift<7>() | b.shift<9>();
 			pawnAttacks[BLACK][sq] |= b.shift<-9>() | b.shift<-7>();
+		}
+
+		// squares in between two squares
+		for (Square i = A1; i < N_SQUARES; ++i) {
+			for (Square j = A1; j < N_SQUARES; ++j) {
+				Bitboard b = Bitboard::fromSquare(j);
+				for (const auto& arr : rayAttacks) {
+					if (arr[i] & b) {
+						inBetweenSquares[i][j] = arr[i] - arr[j] - b;
+						break;
+					}
+				}
+			}
 		}
 	}
 

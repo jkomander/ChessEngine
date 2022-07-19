@@ -11,7 +11,7 @@
 
 int main() {
 	attacks::init();
-	eval::init();
+	Eval::init();
 	Zobrist::init();
 	tt.setSize(256);
 

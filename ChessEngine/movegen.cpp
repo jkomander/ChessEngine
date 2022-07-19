@@ -4,102 +4,6 @@
 const std::array<Move::Promotion, 4>promotions =
 { Move::Knight, Move::Bishop, Move::Rook, Move::Queen };
 
-KingAttackInfo::KingAttackInfo(Board& board) {
-	pinned = Bitboard();
-	attacked = Bitboard();
-
-	Color us = board.sideToMove;
-	Color them = !us;
-	Square ksq = board.ksq(us);
-	Bitboard ourTeam = board.color(us);
-	Bitboard theirTeam = board.color(them);
-	Bitboard queens = board.pieces(them, QUEEN);
-	Bitboard bishops = board.pieces(them, BISHOP) | queens;
-	Bitboard rooks = board.pieces(them, ROOK) | queens;
-
-	int attackerCount = 0;
-
-	Bitboard pawnAttacks = attacks::pawnAttacks[us][ksq] & board.pieces(them, PAWN);
-	if (pawnAttacks) {
-		attacked |= pawnAttacks;
-		++attackerCount;
-	}
-
-	Bitboard knightAttacks = attacks::knightAttacks[ksq] & board.pieces(them, KNIGHT);
-	if (knightAttacks) {
-		attacked |= knightAttacks;
-		++attackerCount;
-	}
-
-	if (attacks::bishopAttacks[ksq].intersects(bishops)) {
-		for (auto direction : attacks::bishopDirections) {
-			Square sq = ksq;
-			Square pinnedSq;
-			bool found = false;
-			Bitboard attackLine = Bitboard();
-			for (;;) {
-				Square sq_ = sq;
-				sq += direction;
-				if (!bb::isValid(sq) || bb::distance(sq, sq_) != 1)
-					break;
-				if (ourTeam.at(sq)) {
-					if (!found) {
-						found = true;
-						pinnedSq = sq;
-					}
-					else break;
-				}
-				if (!found) attackLine.set(sq);
-				if (theirTeam.at(sq)) {
-					if (bishops.at(sq)) {
-						if (found)
-							pinned.set(pinnedSq);
-						else {
-							attacked |= attackLine;
-							++attackerCount;
-						}
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	if (attacks::rookAttacks[ksq].intersects(rooks)) {
-		for (auto direction : attacks::rookDirections) {
-			Square sq = ksq;
-			Square pinnedSq;
-			bool found = false;
-			Bitboard attackLine = Bitboard();
-			for (;;) {
-				Square sq_ = sq;
-				sq += direction;
-				if (!bb::isValid(sq) || bb::distance(sq, sq_) != 1)
-					break;
-				if (ourTeam.at(sq)) {
-					if (!found) {
-						found = true;
-						pinnedSq = sq;
-					}
-					else break;
-				}
-				if (!found) attackLine.set(sq);
-				if (theirTeam.at(sq)) {
-					if (rooks.at(sq)) {
-						if (found) pinned.set(pinnedSq);
-						else {
-							attacked |= attackLine;
-							++attackerCount;
-						}
-					}
-					break;
-				}
-			}
-		}
-	}
-	doubleCheck = attackerCount == 2;
-}
-
 template<Color c>
 void generatePawnMoves(Board& board, MoveList& moveList) {
 	constexpr Color us = c;
@@ -231,11 +135,13 @@ void generateKingMoves(Board& board, MoveList& moveList) {
 }
 
 MoveList generateMoves(Board& board) {
+	if (!board.st->kingAttackInfo.upToDate)
+		board.generateKingAttackInfo(board.st->kingAttackInfo);
+
 	MoveList moveList;
-	KingAttackInfo kingAttackInfo(board);
 
 	if (board.sideToMove == WHITE) {
-		if (!kingAttackInfo.doubleCheck) {
+		if (!board.st->kingAttackInfo.doubleCheck) {
 			generatePawnMoves<WHITE>(board, moveList);
 			generatePieceMoves<WHITE, KNIGHT>(board, moveList);
 			generatePieceMoves<WHITE, BISHOP>(board, moveList);
@@ -246,7 +152,7 @@ MoveList generateMoves(Board& board) {
 	}
 
 	else {
-		if (!kingAttackInfo.doubleCheck) {
+		if (!board.st->kingAttackInfo.doubleCheck) {
 			generatePawnMoves<BLACK>(board, moveList);
 			generatePieceMoves<BLACK, KNIGHT>(board, moveList);
 			generatePieceMoves<BLACK, BISHOP>(board, moveList);
@@ -258,12 +164,15 @@ MoveList generateMoves(Board& board) {
 	
 	moveList.erase(
 		remove_if(moveList.begin(), moveList.end(),
-			[&](Move m) { return !isLegal(m, board, kingAttackInfo); }),
+			[&](Move m) { return !isLegal(m, board); }),
 		moveList.end());
 	return moveList;
 }
 
-bool isLegal(Move move, Board& board, KingAttackInfo& kingAttackInfo) {
+bool isLegal(Move move, Board& board) {
+	if (!board.st->kingAttackInfo.upToDate)
+		board.generateKingAttackInfo(board.st->kingAttackInfo);
+
 	Square from = move.from;
 	Square to = move.to;
 	Piece pc = board.getPiece(from);
@@ -272,7 +181,7 @@ bool isLegal(Move move, Board& board, KingAttackInfo& kingAttackInfo) {
 
 	if (pc == bb::getPiece(us, KING)) {
 		if (move.moveType == Move::CASTLING) {
-			if (kingAttackInfo.check() ||
+			if (board.st->kingAttackInfo.check() ||
 				to == bb::relativeSquare(us, C1) && 
 				   (isUnderAttack(us, bb::relativeSquare(us, D1), board) ||
 					isUnderAttack(us, bb::relativeSquare(us, C1), board)) ||
@@ -289,12 +198,13 @@ bool isLegal(Move move, Board& board, KingAttackInfo& kingAttackInfo) {
 		}
 	}
 
-	else if (kingAttackInfo.check() && (!kingAttackInfo.attacked.at(to) || kingAttackInfo.pinned.at(from)))
+	else if (board.st->kingAttackInfo.check() && 
+		(!board.st->kingAttackInfo.attacked.at(to) || board.st->kingAttackInfo.pinned.at(from)))
 		return false;
 
 	else {
 		// pins when not in check
-		if (kingAttackInfo.pinned.at(from)) {
+		if (board.st->kingAttackInfo.pinned.at(from)) {
 			Square ksq = board.ksq(us);
 			int dx_from = bb::file(from) - bb::file(ksq);
 			int dy_from = bb::rank(from) - bb::rank(ksq);
@@ -339,24 +249,4 @@ bool isUnderAttack(Color us, Square sq, Board& board) {
 
 bool isInCheck(Board& board) {
 	return isUnderAttack(board.sideToMove, board.ksq(board.sideToMove), board);
-}
-
-template<bool Root>
-uint64_t perft(Board& board, int depth) {
-	uint64_t cnt, nodes = 0;
-	const bool leaf = (depth == 2);
-
-	for (auto& move : generateMoves(board)) {
-		if (Root && depth <= 1)
-			cnt = 1, ++nodes;
-		else {
-			board.applyMove(move);
-			cnt = leaf ? generateMoves(board).size() : perft<false>(board, depth - 1);
-			nodes += cnt;
-			board.undoMove();
-		}
-		if (Root)
-			std::cout << move.toString() << ": " << cnt << "\n";
-	}
-	return nodes;
 }

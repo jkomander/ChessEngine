@@ -360,7 +360,6 @@ bool Board::givesCheck(Move move) {
 	if (attacked & theirKingBB)
 		return true;
 
-
 	// castling
 	if (move.isCastling()) {
 		occ.clear(move.from);
@@ -388,4 +387,197 @@ bool Board::givesCheck(Move move) {
 	}
 
 	return false;
+}
+
+bool Board::isPseudoLegal(Move move) {
+	if (!move)
+		return false;
+
+	Color us = sideToMove;
+	Color them = !sideToMove;
+	Piece pc = getPiece(move.from);
+	PieceType pt = bb::getPieceType(pc);
+
+	if (pc == NO_PIECE || bb::getColor(pc) == them)
+		return false;
+
+	if (move.isPromotion() && pt != PAWN)
+		return false;
+
+	if (pt == KNIGHT) {
+		if (color(us).at(move.to) ||
+			!attacks::knightAttacks[move.from].at(move.to))
+			return false;
+	}
+
+	else if (pt == ROOK) {
+		if (color(us).at(move.to) ||
+			!attacks::rookAttacks[move.from].at(move.to) ||
+			attacks::inBetweenSquares[move.from][move.to] & occupiedBB)
+			return false;
+	}
+
+	else if (pt == BISHOP) {
+		if (color(us).at(move.to) ||
+			!attacks::bishopAttacks[move.from].at(move.to) ||
+			attacks::inBetweenSquares[move.from][move.to] & occupiedBB)
+			return false;
+	}
+
+	else if (pt == QUEEN) {
+		if (color(us).at(move.to) ||
+			!(attacks::rookAttacks[move.from].at(move.to) ||
+			attacks::bishopAttacks[move.from].at(move.to)) ||
+			attacks::inBetweenSquares[move.from][move.to] & occupiedBB)
+			return false;
+	}
+
+	else if (pt == PAWN) {
+		int pawnPush = bb::pawnPush(us);
+
+		if ((bb::rank(move.from) == us == WHITE ? RANK_2 : RANK_7) &&
+			move.to - move.from == 2 * pawnPush &&
+			!occupiedBB.at(move.from + pawnPush) &&
+			!occupiedBB.at(move.to))
+			return true;
+
+		else if (move.to - move.from == pawnPush) {
+			if (!occupiedBB.at(move.to))
+				return true;
+		}
+
+		else if (move.isEnPassant()) {
+			if (st->epSquare == move.to &&
+				getPiece(move.to - pawnPush) == bb::getPiece(them, PAWN) &&
+				!occupiedBB.at(move.to) &&
+				attacks::pawnAttacks[us][move.from].at(move.to))
+				return true;
+		}
+
+		else if (bb::distance(move.from, move.to) == 1 &&
+			color(them).at(move.to)) {
+			if (attacks::pawnAttacks[us][move.from].at(move.to))
+				return true;
+		}
+
+		return false;
+	}
+	
+	else if (pt == KING) {
+		if (move.isCastling()) {
+			Color c = bb::rank(move.to) == RANK_1 ? WHITE : BLACK;
+			bool kingSide = move.to > move.from;
+
+			if (c != us ||
+				!canCastle(c == WHITE ? kingSide ? WHITE_KING_SIDE : WHITE_QUEEN_SIDE :
+										kingSide ? BLACK_KING_SIDE : BLACK_QUEEN_SIDE) ||
+				occupiedBB & (c == WHITE ? kingSide ? WHITE_KING_SIDE_PATH : WHITE_QUEEN_SIDE_PATH :
+										   kingSide ? BLACK_KING_SIDE_PATH : BLACK_QUEEN_SIDE_PATH))
+				return false;
+		}
+		else {
+			if (color(us).at(move.to) ||
+				bb::distance(move.from, move.to) != 1)	
+				return false;
+		}
+	}
+
+	return true;
+}
+
+void Board::generateKingAttackInfo(KingAttackInfo& k) {
+	k.pinned = Bitboard();
+	k.attacked = Bitboard();
+
+	Color us = sideToMove;
+	Color them = !us;
+	Square kSquare = ksq(us);
+	Bitboard ourTeam = color(us);
+	Bitboard theirTeam = color(them);
+	Bitboard queens = pieces(them, QUEEN);
+	Bitboard bishops = pieces(them, BISHOP) | queens;
+	Bitboard rooks = pieces(them, ROOK) | queens;
+
+	int attackerCount = 0;
+
+	Bitboard pawnAttacks = attacks::pawnAttacks[us][kSquare] & pieces(them, PAWN);
+	if (pawnAttacks) {
+		k.attacked |= pawnAttacks;
+		++attackerCount;
+	}
+
+	Bitboard knightAttacks = attacks::knightAttacks[kSquare] & pieces(them, KNIGHT);
+	if (knightAttacks) {
+		k.attacked |= knightAttacks;
+		++attackerCount;
+	}
+
+	if (attacks::bishopAttacks[kSquare].intersects(bishops)) {
+		for (auto direction : attacks::bishopDirections) {
+			Square sq = kSquare;
+			Square pinnedSq;
+			bool found = false;
+			Bitboard attackLine = Bitboard();
+			for (;;) {
+				Square sq_ = sq;
+				sq += direction;
+				if (!bb::isValid(sq) || bb::distance(sq, sq_) != 1)
+					break;
+				if (ourTeam.at(sq)) {
+					if (!found) {
+						found = true;
+						pinnedSq = sq;
+					}
+					else break;
+				}
+				if (!found) attackLine.set(sq);
+				if (theirTeam.at(sq)) {
+					if (bishops.at(sq)) {
+						if (found)
+							k.pinned.set(pinnedSq);
+						else {
+							k.attacked |= attackLine;
+							++attackerCount;
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	if (attacks::rookAttacks[kSquare].intersects(rooks)) {
+		for (auto direction : attacks::rookDirections) {
+			Square sq = kSquare;
+			Square pinnedSq;
+			bool found = false;
+			Bitboard attackLine = Bitboard();
+			for (;;) {
+				Square sq_ = sq;
+				sq += direction;
+				if (!bb::isValid(sq) || bb::distance(sq, sq_) != 1)
+					break;
+				if (ourTeam.at(sq)) {
+					if (!found) {
+						found = true;
+						pinnedSq = sq;
+					}
+					else break;
+				}
+				if (!found) attackLine.set(sq);
+				if (theirTeam.at(sq)) {
+					if (rooks.at(sq)) {
+						if (found) k.pinned.set(pinnedSq);
+						else {
+							k.attacked |= attackLine;
+							++attackerCount;
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
+	k.doubleCheck = attackerCount == 2;
+	k.upToDate = true;
 }

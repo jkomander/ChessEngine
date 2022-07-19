@@ -19,13 +19,15 @@ enum Scores :int16_t {
 struct Stack {
 	Move pv[256];
 	int pvSize;
+	int ply;
 };
 
 struct Search {
 	TimeManagement time;
 	MoveList pv;
 	uint64_t nodes;
-	uint64_t history[16][N_SQUARES] = { 0 };
+	uint64_t history[16][N_SQUARES] = {};
+	Move killer[256][2] = {};
 
 	Move bestMove(Board& board);
 	template<SearchType searchType>

@@ -1,5 +1,6 @@
 #pragma once
 
+#include<cassert>
 #include<cstdint>
 #include<intrin.h>
 #include<string>
@@ -104,6 +105,7 @@ const std::string pieceToChar = " PNBRQK  pnbrqk";
 
 namespace bb {
 	inline Piece getPiece(Color c, PieceType pt) {
+		assert(pt != NO_PIECE_TYPE);
 		return c * 8 + pt;
 	}
 
@@ -292,13 +294,17 @@ struct Move {
 
 	bool operator==(const Move& other) {
 		return this->from == other.from &&
-			   this->to == other.to &&
-			   this->promotion == other.promotion &&
-			   this->moveType == other.moveType;
+			this->to == other.to &&
+			this->promotion == other.promotion &&
+			this->moveType == other.moveType;
+	}
+
+	bool operator!=(const Move& other) {
+		return !(*this == other);
 	}
 
 	explicit operator bool() {
-		return *this == Move();
+		return *this != Move();
 	}
 
 	friend std::ostream& operator<<(std::ostream& os, Move& move) {

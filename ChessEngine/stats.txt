@@ -15,78 +15,59 @@ Elapsed time: 9.3e-06
 Depth: 5
 Bounds: 235 285
 Bounds: 235 310
-PV: b1c3 g7g6 g1f3 f7f5 d2d4
+PV: b1c3 f7f5 d2d4 a7a6 g1f3
 Score: 300
 tt usage: 0.001
-Elapsed time: 0.052
-Nodes searched: 19493
+Elapsed time: 0.082
+Nodes searched: 26110
 
 Depth: 6
 Bounds: 275 325
 Bounds: 250 300
-Bounds: 219 275
-Bounds: 181 247
-PV: b1a3 e7e5 a3c4 d8h4 c4e5 h4h2
-Score: 195
-tt usage: 0.006
-Elapsed time: 0.813
-Nodes searched: 248359
+PV: b1c3 f7f5 d2d4 a7a6 g1f3 b7b6
+Score: 260
+tt usage: 0.001
+Elapsed time: 0.312
+Nodes searched: 76504
 
 Depth: 7
-Bounds: 170 220
-Bounds: 170 245
-Bounds: 170 276
-Bounds: 170 314
-PV: d2d4 g7g6 g1f3 f7f5 d1d3 b7b6 d3f5
-Score: 310
-tt usage: 0.011
-Elapsed time: 2.463
-Nodes searched: 826825
+Bounds: 235 285
+PV: b1c3 f7f5 d2d4 a7a6 g1f3 b7b6 e2e4
+Score: 280
+tt usage: 0.002
+Elapsed time: 1.181
+Nodes searched: 400424
 
 Depth: 8
-Bounds: 285 335
-Bounds: 260 310
-Bounds: 229 285
-Bounds: 191 257
-Bounds: 144 224
-PV: d2d4 c7c5 d4c5 d8a5 c1d2 a5c5 g1f3 c5f2
-Score: 165
-tt usage: 0.038
-Elapsed time: 14.249
-Nodes searched: 3966044
+Bounds: 255 305
+Bounds: 230 280
+PV: b1c3 d7d5 d2d4 a7a6 g1f3 f7f5 c1e3 g7g6
+Score: 255
+tt usage: 0.014
+Elapsed time: 7.801
+Nodes searched: 1488285
 
 Depth: 9
-Bounds: 140 190
-Bounds: 140 215
-Bounds: 140 246
-Bounds: 140 284
-Bounds: 140 331
-PV: d2d4 g7g6 g1f3 f7f5 b1c3 b7b6 d1d3 c7c5 d3f5
-Score: 320
-tt usage: 0.094
-Elapsed time: 39.792
-Nodes searched: 13611760
+Bounds: 230 280
+PV: b1c3 a7a6 e2e4 g7g6 f1d3 c7c6 g1f3 d7d5 e4e5
+Score: 270
+tt usage: 0.047
+Elapsed time: 26.31
+Nodes searched: 7382412
 
 Depth: 10
-Bounds: 295 345
-Bounds: 270 320
-Bounds: 239 295
-Bounds: 201 267
-Bounds: 154 234
-PV: d2d4 e7e6 c1f4 d8h4 f4g3 h4h5 g3c7 f8b4 c2c3 h5h2
-Score: 155
-tt usage: 0.734
-Elapsed time: 515.821
-Nodes searched: 141132000
+Bounds: 245 295
+Bounds: 220 270
+PV: e2e4 a7a6 d2d4 g7g6 b1c3 b7b6 g1f3 h7h6 c1e3 f7f5
+Score: 240
+tt usage: 0.234
+Elapsed time: 189.127
+Nodes searched: 34175588
 
 Depth: 11
-Bounds: 130 180
-Bounds: 130 205
-Bounds: 130 236
-Bounds: 130 274
-Bounds: 130 321
-PV: b1c3 e7e6 g1f3 f7f5 d2d4 h7h6 e2e4 f5e4 c3e4 f8b4 c1d2
-Score: 320
-tt usage: 0.971
-Elapsed time: 1513.99
-Nodes searched: 446484839
+Bounds: 215 265
+PV: e2e4 a7a6 d2d4 g7g6 b1c3 b7b6 c1e3 f7f5 f1c4 h7h6 g1e2
+Score: 255
+tt usage: 0.512
+Elapsed time: 696.363
+Nodes searched: 169414374

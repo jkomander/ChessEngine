@@ -133,6 +133,7 @@
     <ClCompile Include="board.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="movegen.cpp" />
+    <ClCompile Include="movepick.cpp" />
     <ClCompile Include="search.cpp" />
     <ClCompile Include="timeman.cpp" />
     <ClCompile Include="tt.cpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="board.h" />
     <ClInclude Include="eval.h" />
     <ClInclude Include="movegen.h" />
+    <ClInclude Include="movepick.h" />
     <ClInclude Include="random.h" />
     <ClInclude Include="search.h" />
     <ClInclude Include="timeman.h" />

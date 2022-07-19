@@ -3,6 +3,39 @@
 #include"movegen.h"
 #include"uci.h"
 
+void uci::loop() {
+	board = Board(startFEN);
+
+	std::string line, token;
+	std::istringstream ss;
+
+	for (;;) {
+		std::getline(std::cin, line);
+		ss = std::istringstream(line);
+		token.clear();
+		ss >> token;
+
+		if (token == "quit") {
+			stop();
+			break;
+		}
+
+		if (token == "stop") stop();
+
+		else if (token == "id") {
+		}
+		else if (token == "uci")
+			std::cout << "uciok\n";
+		else if (token == "isready")
+			std::cout << "readyok\n";
+		else if (token == "position") position(ss);
+		else if (token == "go")       go(ss.str());
+
+		// non-UCI commands
+		else if (token == "d") std::cout << board << std::endl;
+	}
+}
+
 void uci::position(std::istringstream& ss) {
 	std::string token, fen;
 	ss >> token;
@@ -51,39 +84,6 @@ void uci::go(const std::string& str) {
 
 	// start the search
 	searchThread = std::thread(searchAndPrint);
-}
-
-void uci::loop() {
-	board = Board(startFEN);
-
-	std::string line, token;
-	std::istringstream ss;
-
-	for (;;) {
-		std::getline(std::cin, line);
-		ss = std::istringstream(line);
-		token.clear();
-		ss >> token;
-
-		if (token == "quit") {
-			stop();
-			break;
-		}
-
-		if (token == "stop") stop();
-
-		else if (token == "id") {
-		}
-		else if (token == "uci")
-			std::cout << "uciok\n";
-		else if (token == "isready")
-			std::cout << "readyok\n";
-		else if (token == "position") position(ss);
-		else if (token == "go")       go(ss.str());
-
-		// non-UCI commands
-		else if (token == "d") std::cout << board << std::endl;
-	}
 }
 
 Move uci::toMove(const std::string& str) {

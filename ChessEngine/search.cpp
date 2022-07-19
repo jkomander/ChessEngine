@@ -1,4 +1,5 @@
-#include"eval.h"
+#include"eval.h" 
+#include"movepick.h"
 #include"random.h"
 #include"search.h"
 
@@ -7,8 +8,11 @@ Move Search::bestMove(Board& board) {
 	
 	Color us = board.sideToMove;
 	time.maximum = time.time[us];
-	if (time.maximum)
-		time.optimum = 0.1 * (time.maximum - time.inc[us]) + time.inc[us] - 100;
+	if (time.maximum) {
+		TimePoint delta = 100;
+		time.optimum = (time.maximum < time.inc[us] ? time.maximum :
+						0.1 * (time.maximum - time.inc[us]) + time.inc[us]) - delta;
+	}
 	else
 		time.optimum = 7 * 24 * 3600 * 1000;
 	std::cout << "Optimal time: " << 1e-3 * time.optimum << std::endl << "\n";
@@ -22,6 +26,7 @@ Move Search::bestMove(Board& board) {
 	Score prevScore;
 	Score score;
 	Stack stack;
+	stack.ply = 0;
 	Depth depth = 1;
 
 	// iterative deepening
@@ -99,12 +104,14 @@ Score Search::alphaBeta(Board& board, Stack* ss, Score alpha, Score beta, Depth 
 		return quiescence<pvNode ? PV : NonPV>(board, alpha, beta);
 
 	Stack stack = Stack();
+	stack.ply = ss->ply + 1;
 
 	// transposition table lookup
 	Key key = board.key();
 	bool found;
 	TTEntry* tte = tt.probe(key, found);
 	NodeType nodeType = NONE_NODE;
+	Move hashMove = Move();
 
 	if (!pvNode && found && depth <= tte->depth) {
 		if (tte->nodeType == PV_NODE ||
@@ -114,46 +121,45 @@ Score Search::alphaBeta(Board& board, Stack* ss, Score alpha, Score beta, Depth 
 		}
 	}
 
-	MoveList moves = generateMoves(board);
-	int moveCount = 0;
-
-	// shuffle the moves randomly
-	std::shuffle(moves.begin(), moves.end(), random::rng);
-
 	// PV-move
-	int offset = 0;
-	if (pvNode && depth > 1 && (int)pv.size() - depth + 1 >= 0) {
-		for (int i = 0; i < moves.size(); ++i) {
-			if (moves[i] == pv[pv.size() - depth + 1]) {
-				std::swap(moves[0], moves[i]);
-				offset = 1;
-				break;
-			}
-		}
-	}
+	if (pvNode && depth > 1 && (int)pv.size() - depth + 1 >= 0)
+		hashMove = pv[pv.size() - depth + 1];
+
 	// hash move
-	else if (tte->nodeType == PV_NODE || tte->nodeType == CUT_NODE) {
-		for (int i = 0; i < moves.size(); ++i) {
-			if (moves[i] == tte->move) {
-				std::swap(moves[0], moves[i]);
-				offset = 1;
-				break;
-			}
-		}
+	else if (found && (tte->nodeType == PV_NODE || tte->nodeType == CUT_NODE))
+		hashMove = tte->move;
+
+	if (hashMove) {
+		if (!board.isPseudoLegal(hashMove) || !isLegal(hashMove, board))
+			hashMove = Move();
 	}
 
-	// history heuristic
-	std::stable_sort(moves.begin() + offset, moves.end(),
-		[&](Move m1, Move m2) {
-			return history[board.getPiece(m1.from)][m1.to] > history[board.getPiece(m2.from)][m2.to];
-		}
-	);
+	// first killer move
+	Move killerMove1 = killer[ss->ply][0];
+	if (!board.isPseudoLegal(killerMove1) || !isLegal(killerMove1, board))
+		killerMove1 = Move();
 
+	// second killer move
+	Move killerMove2 = killer[ss->ply][1];
+	if (!board.isPseudoLegal(killerMove2) || !isLegal(killerMove2, board))
+		killerMove2 = Move();
+	
+	int moveCount = 0;
+	MovePicker mp = MovePicker(this, &board, hashMove, killerMove1, killerMove2);
 	Score bestScore = -INFINITY_SCORE;
 	Score score;
-	for (auto move : moves) {
-		++moveCount;
 
+	for (;;) {
+		Move move = mp.next();
+
+		if (!move)
+			break;
+
+		assert(board.isPseudoLegal(move)); 
+		assert(isLegal(move, board));
+
+		++moveCount;
+		
 		if (rootNode && depth >= 11)
 			std::cout << move << std::endl;
 
@@ -162,7 +168,7 @@ Score Search::alphaBeta(Board& board, Stack* ss, Score alpha, Score beta, Depth 
 		if (pvNode && moveCount == 1)
 			score = -alphaBeta<PV>(board, &stack, -beta, -alpha, depth - 1);
 		else {
-			score = -alphaBeta<NonPV>(board, &stack, -(alpha + 1), -alpha, depth - 1);
+			score = -alphaBeta<NonPV>(board, &stack, -alpha - 1, -alpha, depth - 1);
 			if (score > alpha && score < beta) {
 				score = -alphaBeta<PV>(board, &stack, -beta, -alpha, depth - 1);
 			}
@@ -185,8 +191,15 @@ Score Search::alphaBeta(Board& board, Stack* ss, Score alpha, Score beta, Depth 
 
 		if (score >= beta) {
 			tte->save(key, score, move, depth, CUT_NODE);
+
 			Piece pc = board.getPiece(move.from);
 			history[pc][move.to] += depth * depth;
+
+			if (move != killer[ss->ply][0]) {
+				killer[ss->ply][1] = killer[ss->ply][0];
+				killer[ss->ply][0] = move;
+			}
+
 			return score;
 		}
 
@@ -220,11 +233,14 @@ Score Search::quiescence(Board& board, Score alpha, Score beta) {
 	if (board.isDraw())
 		return DRAW_SCORE;
 
-	Score bestScore = evaluate(board);
-	if (bestScore >= beta)
-		return bestScore;
-	if (bestScore > alpha)
-		alpha = bestScore;
+	Score standPat = evaluate(board);
+	Score bestScore = standPat;
+
+	// standPat acts as a lower bound
+	if (standPat >= beta)
+		return standPat;
+	if (standPat > alpha)
+		alpha = standPat;
 
 	MoveList moves = generateMoves(board);
 
@@ -239,8 +255,7 @@ Score Search::quiescence(Board& board, Score alpha, Score beta) {
 		moves.end());
 
 	// shuffle the moves randomly
-	std::mt19937_64 rng(0);
-	std::shuffle(moves.begin(), moves.end(), rng);
+	std::shuffle(moves.begin(), moves.end(), random::rng);
 
 	Score score;
 	for (auto move : moves) {

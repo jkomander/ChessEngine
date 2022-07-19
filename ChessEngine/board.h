@@ -22,12 +22,10 @@ enum CastlingRights {
 	ANY_CASTLING = WHITE_CASTLING | BLACK_CASTLING,
 };
 
-enum MoveTypes {
-	NORMAL,
-	CASTLING,
-	EN_PASSANT,
-	PROMOTION
-};
+const Bitboard WHITE_KING_SIDE_PATH = Bitboard(0x60);
+const Bitboard WHITE_QUEEN_SIDE_PATH = Bitboard(0xe);
+const Bitboard BLACK_KING_SIDE_PATH = Bitboard(0x60).mirrored();
+const Bitboard BLACK_QUEEN_SIDE_PATH = Bitboard(0xe).mirrored();
 
 struct Castlings {
 	int data;
@@ -36,6 +34,15 @@ struct Castlings {
 	void reset(int cr) { data &= ~cr; }
 	bool canCastle(int cr) { return data & cr; }
 	bool noCastling() { return data == 0; }
+};
+
+struct KingAttackInfo {
+	Bitboard pinned;
+	Bitboard attacked;
+	bool doubleCheck;
+	bool upToDate;
+
+	bool check() { return bool(attacked); }
 };
 
 struct BoardStatus {
@@ -48,6 +55,7 @@ struct BoardStatus {
 	Square epSquare;
 	Piece captured;
 	Move move;
+	KingAttackInfo kingAttackInfo;
 
 	friend std::ostream& operator<<(std::ostream& os, BoardStatus& bs);
 };
@@ -78,6 +86,8 @@ struct Board {
 
 	BoardStatus* getBoardStatus();
 	Key key();
+	// King square
+	Square ksq(Color c);
 
 	bool canCastle(int cr);
 	bool noCastling();
@@ -92,14 +102,15 @@ struct Board {
 	Bitboard pieces(Color c, PieceType pt);
 	Bitboard occupied();
 
-	// King square
-	Square ksq(Color c);
-	
 	// Draw by fifty-move rule or threefold repetition
 	bool isDraw();
-
+	
 	bool isCapture(Move move);
 	bool givesCheck(Move move);
+	// tests whether a move from the transposition table or the principal variation is pseudo-legal
+	bool isPseudoLegal(Move move);
+
+	void generateKingAttackInfo(KingAttackInfo& k);
 };
 
 inline Piece Board::getPiece(Square sq) {

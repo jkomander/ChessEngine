@@ -2,7 +2,7 @@
 
 #include"movegen.h"
 
-namespace eval {
+namespace Eval {
 	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>pawnTable;
 	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>knightTable;
 	inline std::array<std::array<Score, N_SQUARES>, N_COLORS>bishopTable;
@@ -109,7 +109,7 @@ namespace eval {
 }
 
 inline Score evaluate(Board& board) {
-	using namespace eval;
+	using namespace Eval;
 
 	Color us = board.sideToMove;
 	Color them = !us;
